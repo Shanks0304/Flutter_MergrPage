@@ -9,7 +9,7 @@ class TabViewCustom extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.04,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         border: Border(
           bottom: BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
         ),
@@ -31,11 +31,9 @@ class TabViewCustom extends StatelessWidget {
 
           // second tab [you can add an icon using the icon property]
           Tab(
-            child: Container(
-              child: Text(
-                "LEADERBOARD",
-                style: TypeClass.bodyTextStyle,
-              ),
+            child: Text(
+              "LEADERBOARD",
+              style: TypeClass.bodyTextStyle,
             ),
           ),
         ],

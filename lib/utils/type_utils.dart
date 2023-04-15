@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class TypeClass {
@@ -16,7 +15,7 @@ class TypeClass {
     padding: EdgeInsets.zero,
     shape: const CircleBorder(),
   );
-  static TextStyle bodyTextStyle = TextStyle(
+  static TextStyle bodyTextStyle = const TextStyle(
     color: Colors.white,
     fontSize: 13,
   );

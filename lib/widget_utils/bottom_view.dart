@@ -1,3 +1,4 @@
+// TODO Implement this library.
 import 'package:flutter/material.dart';
 import 'package:myapp/utils/type_utils.dart';
 
@@ -8,7 +9,7 @@ class BottomView extends StatelessWidget {
     final sWidth = MediaQuery.of(context).size.width;
     final sHeight = MediaQuery.of(context).size.height;
     return SizedBox(
-      height: sHeight * 0.2,
+      height: sHeight * 0.19 - 6,
       child: Row(
         children: [
           Container(

@@ -1,16 +1,14 @@
 import 'dart:io';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
+import 'package:myapp/utils/label.dart';
 import 'package:myapp/utils/type_utils.dart';
-import 'package:myapp/widget_utils/bottome_view.dart';
-import 'package:myapp/widget_utils/savedfilePath_view.dart';
+import 'package:myapp/widget_utils/bottom_view.dart';
+import 'package:myapp/utils/button.dart';
+import 'package:myapp/utils/playbtn.dart';
+import 'package:myapp/widget_utils/savedPath_view.dart';
 import 'package:myapp/widget_utils/tab_view.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:easy_audio_trimmer/easy_audio_trimmer.dart';
@@ -18,7 +16,6 @@ import 'package:nb_utils/nb_utils.dart';
 
 import 'merge_audio_service.dart';
 import 'widget_utils/header_view.dart';
-import 'utils/type_utils.dart';
 
 void main() {
   runApp(const MyApp());
@@ -128,14 +125,13 @@ class _MyHomePageState extends State<MyHomePage>
   bool success = false;
   File? savedFile;
   String? path;
-  Duration merged_Duration = Duration();
+  Duration mergedDuration = Duration();
 
   late Trimmer _trimmer;
   double _startValue = 0.0;
   double _endValue = 0.0;
   bool _isPlaying = false;
   bool playbackState = false;
-  int _currentIndex = 0;
 
   Future<File> writeFile(File data) async {
     // storage permission ask
@@ -143,17 +139,6 @@ class _MyHomePageState extends State<MyHomePage>
     if (!status.isGranted) {
       await Permission.storage.request();
     }
-
-    // var directory = await getApplicationDocumentsDirectory();
-    // // ignore: unnecessary_null_comparison
-    // if (directory != null) {
-    //   setState(() {
-    //     path = "${directory.path}/SavedRecording.wav";
-    //   });
-    //   return data.copy(path!);
-    // } else {
-    //   debugPrint("directory empty");
-    // }
     return data;
   }
 
@@ -206,136 +191,55 @@ class _MyHomePageState extends State<MyHomePage>
         color: Colors.black,
         child: Column(
           children: [
-            HeaderView(),
+            const HeaderView(),
             TabViewCustom(tabController: _tabController), // tab bar view here
             Expanded(
               child: TabBarView(
                 controller: _tabController,
                 children: [
                   // first tab bar view widget
-                  Container(
+                  SizedBox(
                     height: sHeight - 10,
                     child: Column(
                       children: [
-                        Container(
-                          height: sHeight * 0.1,
-                          alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.only(top: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Filename: ${(fileName_1 != "") ? fileName_1.split("/").last : ""}",
-                                style: TypeClass.bodyTextStyle,
-                              ),
-                              Text(
-                                "Time: ${(fileName_1 != "") ? _printDuration(duration_1) : ""}",
-                                style: TypeClass.bodyTextStyle,
-                              ),
-                            ],
-                          ),
+                        PathLabel(fileName: fileName_1, duration: duration_1),
+                        Button(
+                            label: "Add File 1",
+                            color: Colors.white,
+                            buttonStyle: TypeClass.srButtonStyle,
+                            onPressFunc: filePicker1),
+                        PathLabel(fileName: fileName_2, duration: duration_2),
+                        Button(
+                            label: "Add File 2",
+                            color: Colors.white,
+                            buttonStyle: TypeClass.srButtonStyle,
+                            onPressFunc: filePicker2),
+                        Padding(
+                          padding: EdgeInsets.only(top: sHeight * 0.08),
+                          child: Button(
+                              label: "Merge Files",
+                              buttonStyle: TypeClass.mrButtonStyle,
+                              color: Colors.white,
+                              onPressFunc: mergeFiles),
                         ),
                         Container(
-                          width: sWidth - 60,
-                          height: sHeight * 0.05,
-                          margin: EdgeInsets.only(bottom: 10),
-                          child: OutlinedButton(
-                            onPressed: filePicker1,
-                            style: TypeClass.srButtonStyle,
-                            child: Text("Add File 1",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                )),
-                          ),
-                        ),
-                        Container(
-                          height: sHeight * 0.1,
-                          alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.only(top: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  "Filename: ${(fileName_2 != "") ? fileName_2.split("/").last : ""}",
-                                  style: TypeClass.bodyTextStyle),
-                              Text(
-                                "Time: ${(fileName_2 != "") ? _printDuration(duration_2) : ""}",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          width: sWidth - 60,
-                          height: sHeight * 0.05,
-                          child: OutlinedButton(
-                            onPressed: filePicker2,
-                            style: TypeClass.srButtonStyle,
-                            child: Text("Add File 2",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                )),
-                          ),
-                        ),
-                        Container(
-                            height: sHeight * 0.13,
-                            width: sWidth - 60,
-                            padding: EdgeInsets.only(top: sHeight * 0.08),
-                            margin: const EdgeInsets.only(bottom: 25),
-                            child: OutlinedButton(
-                              onPressed: mergeFiles,
-                              style: TypeClass.mrButtonStyle,
-                              child: Text(
-                                "Merge Files",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            )),
-                        SizedBox(
                           height: sHeight * 0.18,
+                          margin: const EdgeInsets.only(top: 20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 "Saved File",
                                 style: TypeClass.bodyTextStyle,
-                              ).visible(success),
+                              ),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  TextButton(
-                                    child: _isPlaying
-                                        ? Icon(
-                                            Icons.pause_circle_outline_outlined,
-                                            size: 40,
-                                            color: const Color(0xFFFFFFFF),
-                                          )
-                                        : Icon(
-                                            Icons.play_circle_outline_outlined,
-                                            size: 40,
-                                            color: const Color(0xFFFFFFFF),
-                                          ),
-                                    onPressed: () async {
-                                      playbackState =
-                                          await _trimmer.audioPlaybackControl(
-                                        startValue: _startValue,
-                                        endValue: _endValue,
-                                      );
-                                      WidgetsBinding.instance
-                                          .addPostFrameCallback((_) => setState(
-                                              () =>
-                                                  _isPlaying = playbackState));
-                                    },
-                                  ).visible(success),
+                                  PlayBtn(
+                                      playState: _isPlaying,
+                                      onPressFunc: playState),
                                   Expanded(
                                     child: TrimViewer(
                                       viewerWidth: sWidth - 30,
@@ -346,20 +250,18 @@ class _MyHomePageState extends State<MyHomePage>
                                       durationStyle: DurationStyle.FORMAT_MM_SS,
                                       backgroundColor: const Color(0x1A0075F8),
                                       barColor: const Color(0xFFFFFFFF),
-                                      durationTextStyle: TextStyle(
-                                          color: const Color(0xFFFFFFFF)),
+                                      durationTextStyle: const TextStyle(
+                                          color: Color(0xFFFFFFFF)),
                                       allowAudioSelection: true,
-                                      editorProperties: TrimEditorProperties(
+                                      editorProperties:
+                                          const TrimEditorProperties(
                                         circleSize: 5,
-                                        borderPaintColor:
-                                            const Color(0xFFc80000),
+                                        borderPaintColor: Color(0xFFc80000),
                                         borderWidth: 1,
                                         borderRadius: 0,
-                                        circlePaintColor:
-                                            const Color(0xFFc80000),
+                                        circlePaintColor: Color(0xFFc80000),
                                         scrubberWidth: 3,
-                                        scrubberPaintColor:
-                                            const Color(0xFFc80000),
+                                        scrubberPaintColor: Color(0xFFc80000),
                                       ),
                                       areaProperties:
                                           TrimAreaProperties.edgeBlur(
@@ -374,12 +276,12 @@ class _MyHomePageState extends State<MyHomePage>
                                                     playbackState));
                                       },
                                     ),
-                                  ).visible(success)
+                                  )
                                 ],
                               ),
-                              savedfilePath_view(path: path).visible(success),
+                              SavedPath(path: path).visible(success),
                             ],
-                          ),
+                          ).visible(success),
                         ),
                         const BottomView(),
                       ],
@@ -450,10 +352,12 @@ class _MyHomePageState extends State<MyHomePage>
     });
   }
 
-  String _printDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+  void playState() async {
+    playbackState = await _trimmer.audioPlaybackControl(
+      startValue: _startValue,
+      endValue: _endValue,
+    );
+    WidgetsBinding.instance.addPostFrameCallback(
+        (_) => setState(() => _isPlaying = playbackState));
   }
 }

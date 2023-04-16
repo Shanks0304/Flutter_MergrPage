@@ -303,12 +303,7 @@ class _MyHomePageState extends State<MyHomePage>
     if (result != null) {
       String? filePath = result.files.single.path;
       final player = AudioPlayer();
-      var duration = await player.setUrl(filePath!);
-      // WidgetsBinding.instance
-      //     .addPostFrameCallback((_) => setState(() {
-      //           duration_2 = duration!;
-      //           fileName_2 = filePath;
-      //         }));
+      var duration = await player.setFilePath(filePath!);
       setState(() {
         duration_2 = duration!;
         fileName_2 = filePath;
@@ -323,12 +318,7 @@ class _MyHomePageState extends State<MyHomePage>
     if (result != null) {
       String? filePath = result.files.single.path;
       final player = AudioPlayer();
-      var duration = await player.setUrl(filePath!);
-      // WidgetsBinding.instance
-      //     .addPostFrameCallback((_) => setState(() {
-      //           duration_1 = duration!;
-      //           fileName_1 = filePath;
-      //         }));
+      var duration = await player.setFilePath(filePath!);
       setState(() {
         duration_1 = duration!;
         fileName_1 = filePath;

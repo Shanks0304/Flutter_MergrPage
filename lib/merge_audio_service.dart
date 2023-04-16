@@ -24,7 +24,8 @@ class FFmpeg {
 
     cmd.addAll([
       "-filter_complex",
-      "[0:a] [1:a] amix=inputs=2:duration=longest:dropout_transition=2",
+      // "[0:a] [1:a] amix=inputs=2:duration=longest:dropout_transition=2",
+      "acrossfade=d=10:o=0:c1=exp:c2=nofade",
       file.path
     ]);
 

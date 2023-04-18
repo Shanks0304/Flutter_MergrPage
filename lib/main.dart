@@ -143,7 +143,7 @@ class _MyHomePageState extends State<MyHomePage>
 
   void _loadAudio(File? file) async {
     if (file != null) {
-      await trimmer.loadAudio(audioFile: savedFile!);
+      await trimmer.loadAudio(audioFile: file);
     }
     // await trimmer.loadAudio(audioFile: file);
     if (mounted) {

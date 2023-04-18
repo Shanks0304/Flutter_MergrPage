@@ -127,11 +127,10 @@ class _MyHomePageState extends State<MyHomePage>
   String? path;
   Duration mergedDuration = Duration();
 
-  late Trimmer _trimmer;
+  final Trimmer trimmer = Trimmer();
   double _startValue = 0.0;
   double _endValue = 0.0;
   bool _isPlaying = false;
-  bool playbackState = false;
 
   Future<File> writeFile(File data) async {
     // storage permission ask
@@ -142,18 +141,15 @@ class _MyHomePageState extends State<MyHomePage>
     return data;
   }
 
-  void _loadAudio() async {
-    // setState(() {
-    //   isLoadingSave = true;
-    // });
-    if (savedFile != null) {
-      Trimmer trimmer = Trimmer();
+  void _loadAudio(File? file) async {
+    if (file != null) {
       await trimmer.loadAudio(audioFile: savedFile!);
+    }
+    // await trimmer.loadAudio(audioFile: file);
+    if (mounted) {
       setState(() {
-        _trimmer = trimmer;
-        _startValue = 0.0;
-        _endValue = 0.0;
-        _isPlaying = false;
+        success = (file != null) ? true : false;
+        path = savedFile?.path;
       });
     }
   }
@@ -161,9 +157,7 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   void initState() {
     super.initState();
-
     _tabController = TabController(length: 2, vsync: this);
-    _trimmer = Trimmer();
     _tabController.addListener(() {
       if (_tabController.index == 0) {
         mergeFiles();
@@ -173,11 +167,11 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   void dispose() {
+    super.dispose();
     if (mounted) {
-      // _trimmer.dispose();
+      trimmer.dispose();
       _tabController.dispose();
     }
-    super.dispose();
   }
 
   @override
@@ -185,169 +179,202 @@ class _MyHomePageState extends State<MyHomePage>
     final sWidth = MediaQuery.of(context).size.width;
     final sHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      body: Container(
-        padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
-        color: Colors.black,
-        child: Column(
-          children: [
-            const HeaderView(),
-            TabViewCustom(tabController: _tabController), // tab bar view here
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  // first tab bar view widget
-                  SizedBox(
-                    height: sHeight - 10,
-                    child: Column(
-                      children: [
-                        PathLabel(fileName: fileName_1, duration: duration_1),
-                        Button(
-                            label: "Add File 1",
-                            color: Colors.white,
-                            buttonStyle: TypeClass.srButtonStyle,
-                            onPressFunc: filePicker1),
-                        PathLabel(fileName: fileName_2, duration: duration_2),
-                        Button(
-                            label: "Add File 2",
-                            color: Colors.white,
-                            buttonStyle: TypeClass.srButtonStyle,
-                            onPressFunc: filePicker2),
-                        Padding(
-                          padding: EdgeInsets.only(top: sHeight * 0.08),
-                          child: Button(
-                              label: "Merge Files",
-                              buttonStyle: TypeClass.mrButtonStyle,
+    return WillPopScope(
+      onWillPop: () async {
+        if (Navigator.of(context).userGestureInProgress) {
+          return false;
+        } else {
+          return true;
+        }
+      },
+      child: Scaffold(
+        body: Container(
+          height: sHeight,
+          width: sWidth,
+          padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
+          color: Colors.black,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              const HeaderView(),
+              TabViewCustom(tabController: _tabController), // tab bar view here
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    // first tab bar view widget
+                    SizedBox(
+                      width: sWidth - 60,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          PathLabel(fileName: fileName_1, duration: duration_1),
+                          Button(
+                              label: "Add File 1",
                               color: Colors.white,
-                              onPressFunc: mergeFiles),
-                        ),
-                        Container(
-                          height: sHeight * 0.18,
-                          margin: const EdgeInsets.only(top: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Saved File",
-                                style: TypeClass.bodyTextStyle,
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  PlayBtn(
-                                      playState: _isPlaying,
-                                      onPressFunc: playState),
-                                  Expanded(
-                                    child: TrimViewer(
-                                      viewerWidth: sWidth - 30,
-                                      viewerHeight: 40,
-                                      trimmer: _trimmer,
-                                      maxAudioLength:
-                                          const Duration(minutes: 50),
-                                      durationStyle: DurationStyle.FORMAT_MM_SS,
-                                      backgroundColor: const Color(0x1A0075F8),
-                                      barColor: const Color(0xFFFFFFFF),
-                                      durationTextStyle: const TextStyle(
-                                          color: Color(0xFFFFFFFF)),
-                                      allowAudioSelection: true,
-                                      editorProperties:
-                                          const TrimEditorProperties(
-                                        circleSize: 5,
-                                        borderPaintColor: Color(0xFFc80000),
-                                        borderWidth: 1,
-                                        borderRadius: 0,
-                                        circlePaintColor: Color(0xFFc80000),
-                                        scrubberWidth: 3,
-                                        scrubberPaintColor: Color(0xFFc80000),
+                              buttonStyle: TypeClass.srButtonStyle,
+                              onPressFunc: filePicker1),
+                          PathLabel(fileName: fileName_2, duration: duration_2),
+                          Button(
+                              label: "Add File 2",
+                              color: Colors.white,
+                              buttonStyle: TypeClass.srButtonStyle,
+                              onPressFunc: filePicker2),
+                          Padding(
+                            padding: EdgeInsets.only(top: sHeight * 0.08),
+                            child: Button(
+                                label: "Merge Files",
+                                buttonStyle: TypeClass.mrButtonStyle,
+                                color: Colors.white,
+                                onPressFunc: mergeFiles),
+                          ),
+                          Container(
+                            height: sHeight * 0.18,
+                            margin: const EdgeInsets.only(top: 20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Saved File",
+                                  style: TypeClass.bodyTextStyle,
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: <Widget>[
+                                    PlayBtn(
+                                        playState: _isPlaying,
+                                        onPressFunc: playState),
+                                    Expanded(
+                                      child: TrimViewer(
+                                        viewerHeight: 50,
+                                        trimmer: trimmer,
+                                        maxAudioLength:
+                                            const Duration(minutes: 50),
+                                        durationStyle:
+                                            DurationStyle.FORMAT_MM_SS,
+                                        backgroundColor: Colors.transparent,
+                                        barColor: const Color(0xFFFFFFFF),
+                                        durationTextStyle: const TextStyle(
+                                            color: Color(0xFFFFFFFF)),
+                                        allowAudioSelection: true,
+                                        editorProperties:
+                                            const TrimEditorProperties(
+                                          circleSize: 5,
+                                          borderPaintColor: Color(0xFFc80000),
+                                          borderWidth: 1,
+                                          borderRadius: 0,
+                                          circlePaintColor: Color(0xFFc80000),
+                                          scrubberWidth: 3,
+                                          scrubberPaintColor: Color(0xFFc80000),
+                                        ),
+                                        areaProperties:
+                                            TrimAreaProperties.edgeBlur(
+                                                blurEdges: true),
+                                        onChangeStart: (value) =>
+                                            _startValue = value,
+                                        onChangeEnd: (value) =>
+                                            _endValue = value,
+                                        onChangePlaybackState: (value) {
+                                          if (mounted) {
+                                            setState(() => _isPlaying = value);
+                                          }
+                                        },
                                       ),
-                                      areaProperties:
-                                          TrimAreaProperties.edgeBlur(
-                                              blurEdges: true),
-                                      onChangeStart: (value) =>
-                                          _startValue = value,
-                                      onChangeEnd: (value) => _endValue = value,
-                                      onChangePlaybackState: (value) {
-                                        WidgetsBinding.instance
-                                            .addPostFrameCallback((_) =>
-                                                setState(() => _isPlaying =
-                                                    playbackState));
-                                      },
                                     ),
-                                  )
-                                ],
-                              ),
-                              SavedPath(path: path).visible(success),
-                            ],
-                          ).visible(success),
-                        ),
-                        const BottomView(),
-                      ],
+                                  ],
+                                ),
+                                SavedPath(path: path),
+                              ],
+                            ).visible(success),
+                          ),
+                          const BottomView(),
+                        ],
+                      ),
                     ),
-                  ),
-                  // second tab bar view widget
-                  Container(),
-                ],
+                    // second tab bar view widget
+                    Container(),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
   void filePicker2() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result =
+        await FilePicker.platform.pickFiles(type: FileType.audio);
     if (result != null) {
       String? filePath = result.files.single.path;
-      final player = AudioPlayer();
-      var duration = await player.setFilePath(filePath!);
-      setState(() {
-        duration_2 = duration!;
-        fileName_2 = filePath;
-      });
+      if (mounted) {
+        setState(() {
+          fileName_2 = filePath!;
+        });
+        _getDuration2(fileName_2);
+      }
     } else {
       // User canceled the picker
     }
+  }
+
+  void _getDuration2(String filePath) async {
+    final player = AudioPlayer();
+    var durational = await player.setFilePath(filePath);
+    setState(() {
+      duration_2 = durational!;
+    });
   }
 
   void filePicker1() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result =
+        await FilePicker.platform.pickFiles(type: FileType.audio);
     if (result != null) {
       String? filePath = result.files.single.path;
-      final player = AudioPlayer();
-      var duration = await player.setFilePath(filePath!);
-      setState(() {
-        duration_1 = duration!;
-        fileName_1 = filePath;
-      });
+      if (mounted) {
+        setState(() {
+          fileName_1 = filePath!;
+        });
+        _getDuration1(fileName_1);
+      }
     } else {
       // User canceled the picker
     }
   }
 
-  void mergeFiles() async {
+  void _getDuration1(String filePath) async {
+    final player = AudioPlayer();
+    var durational = await player.setFilePath(filePath);
     setState(() {
-      success = false;
+      duration_1 = durational!;
     });
+  }
+
+  void mergeFiles() async {
+    if (mounted) {
+      setState(() {
+        success = false;
+      });
+    }
     savedFile = await FFmpeg.concatenate([fileName_1, fileName_2], (file) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {
-            savedFile = file;
-            success = (file != null) ? true : false;
-            path = file?.path;
-          }));
-      _loadAudio();
+      _loadAudio(file);
     });
   }
 
   void playState() async {
-    playbackState = await _trimmer.audioPlaybackControl(
+    bool playbackState = await trimmer.audioPlaybackControl(
       startValue: _startValue,
       endValue: _endValue,
     );
-    WidgetsBinding.instance.addPostFrameCallback(
-        (_) => setState(() => _isPlaying = playbackState));
+    if (mounted) {
+      setState(() {
+        _isPlaying = playbackState;
+      });
+    }
   }
 }

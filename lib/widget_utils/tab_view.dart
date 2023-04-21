@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/utils/type_utils.dart';
+import 'package:mergr/utils/type_utils.dart';
 
 class TabViewCustom extends StatelessWidget {
   const TabViewCustom({super.key, required this.tabController});

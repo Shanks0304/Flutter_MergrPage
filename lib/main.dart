@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:myapp/utils/label.dart';
-import 'package:myapp/utils/type_utils.dart';
-import 'package:myapp/widget_utils/bottom_view.dart';
-import 'package:myapp/utils/button.dart';
-import 'package:myapp/utils/playbtn.dart';
-import 'package:myapp/widget_utils/savedPath_view.dart';
-import 'package:myapp/widget_utils/tab_view.dart';
+import 'package:mergr/utils/label.dart';
+import 'package:mergr/utils/type_utils.dart';
+import 'package:mergr/widget_utils/bottom_view.dart';
+import 'package:mergr/utils/button.dart';
+import 'package:mergr/utils/playbtn.dart';
+import 'package:mergr/widget_utils/savedPath_view.dart';
+import 'package:mergr/widget_utils/tab_view.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -18,11 +18,11 @@ import 'merge_audio_service.dart';
 import 'widget_utils/header_view.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const Mergr());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class Mergr extends StatelessWidget {
+  const Mergr({super.key});
 
   // This widget is the root of your application.
   @override

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/utils/type_utils.dart';
+import 'package:mergr/utils/type_utils.dart';
 
 class SavedPath extends StatelessWidget {
   const SavedPath({super.key, required this.path});

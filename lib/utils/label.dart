@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/utils/type_utils.dart';
+import 'package:mergr/utils/type_utils.dart';
 
 class PathLabel extends StatelessWidget {
   const PathLabel({super.key, required this.fileName, required this.duration});

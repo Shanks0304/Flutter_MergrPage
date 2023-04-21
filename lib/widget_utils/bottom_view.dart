@@ -1,6 +1,6 @@
 // TODO Implement this library.
 import 'package:flutter/material.dart';
-import 'package:myapp/utils/type_utils.dart';
+import 'package:mergr/utils/type_utils.dart';
 
 class BottomView extends StatelessWidget {
   const BottomView({super.key});
